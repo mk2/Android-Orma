@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Orma by gfx</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Orma</h1>
+          <h2>An ORM for Android as a wrapper of SQLiteDatabase</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/gfx/Android-Orma/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/gfx/Android-Orma/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/gfx/Android-Orma" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="orma-for-android----" class="anchor" href="#orma-for-android----" aria-hidden="true"><span class="octicon octicon-link"></span></a>Orma for Android <a href="https://circleci.com/gh/gfx/Android-Orma/tree/master"><img src="https://circleci.com/gh/gfx/Android-Orma/tree/master.svg?style=svg" alt="Circle CI"></a> <a href="https://bintray.com/gfx/maven/orma/_latestVersion"> <img src="https://api.bintray.com/packages/gfx/maven/orma/images/download.svg" alt="Download"> </a>
+</h1>
+
+<ul>
+<li>Note that this is an <strong>alpha</strong> software and the interface will change until v1.0.0.</li>
+</ul>
+
+<p>Orma is a lightning-fast ORM (Object-Relation Mapper) for <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html">Android SQLiteDatabase</a>,
+generating helper classes at compile time with annotation processing.</p>
+
+<p>There are already <a href="https://android-arsenal.com/tag/69">a lot of ORMs</a>. Why I have to add another?</p>
+
+<p>The answer is that I need ORM that have the following features:</p>
+
+<ul>
+<li>As fast as hand-written code is</li>
+<li>Model classes must have no restriction
+
+<ul>
+<li>They might be POJO, Parcelable and/or even models that are managed by another ORM</li>
+<li>They should be passed to another thread</li>
+</ul>
+</li>
+<li>Database handles must be instances
+
+<ul>
+<li>Not a singleton nor static-method based class</li>
+</ul>
+</li>
+<li>Automatic migration
+
+<ul>
+<li>For what can be detected logically</li>
+<li>i.e. simple <code>add column</code> and <code>drop column</code>
+</li>
+</ul>
+</li>
+<li>Code completion friendly
+
+<ul>
+<li>
+<code>selectFromModel()</code> is better than <code>selectFrom(Model.class)</code>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>They are just what Orma has. This is as fast as Realm, its models have no restriction, database handle is
+not a singleton, and has <code>SchemaDiffMigration</code> for automatic migration.</p>
+
+<h1>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h1>
+
+<div class="highlight highlight-source-groovy"><pre><span class="pl-c">// To use "apt" in dependencies</span>
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath <span class="pl-s"><span class="pl-pds">'</span>com.neenbedankt.gradle.plugins:android-apt:1.8<span class="pl-pds">'</span></span>
+    }
+}
+
+apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds">'</span>com.neenbedankt.android-apt<span class="pl-pds">'</span></span></pre></div>
+
+<div class="highlight highlight-source-groovy"><pre><span class="pl-c">// To use orma in your Android applications or libraries</span>
+
+dependencies {
+    apt <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma-processor:0.9.0<span class="pl-pds">'</span></span>
+    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma:0.9.0<span class="pl-pds">'</span></span>
+}</pre></div>
+
+<h1>
+<a id="synopsis" class="anchor" href="#synopsis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Synopsis</h1>
+
+<p>First, define model classes annotated with <code>@Table</code>, <code>@Column</code>, and <code>@PrimaryKey</code>.</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">package</span> <span class="pl-smi">com.github.gfx.android.orma.example</span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">com.github.gfx.android.orma.annotation.Column</span>;
+<span class="pl-k">import</span> <span class="pl-smi">com.github.gfx.android.orma.annotation.PrimaryKey</span>;
+<span class="pl-k">import</span> <span class="pl-smi">com.github.gfx.android.orma.annotation.Table</span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">android.support.annotation.Nullable</span>;
+
+@<span class="pl-smi">Table</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Todo</span> {
+
+    <span class="pl-k">@PrimaryKey</span>
+    <span class="pl-k">public</span> <span class="pl-k">long</span> id;
+
+    <span class="pl-k">@Column</span>(<span class="pl-c1">indexed</span> <span class="pl-k">=</span> <span class="pl-c1">true</span>)
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> title;
+
+    <span class="pl-k">@Column</span>
+    <span class="pl-k">@Nullable</span> <span class="pl-c">// indicates NOT NULL constraints</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> content;
+
+    <span class="pl-k">@Column</span>
+    <span class="pl-k">public</span> <span class="pl-k">long</span> createdTimeMillis;
+}</pre></div>
+
+<p>Second, create a database handle <code>OrmaDatabase</code>, which is generated by <code>orma-processor</code>.</p>
+
+<p>To make it:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-c">// see OrmaConfiguration for options</span>
+<span class="pl-c">// each value is the default value.</span>
+<span class="pl-smi">OrmaDatabase</span> orma <span class="pl-k">=</span> <span class="pl-smi">OrmaDatabase</span><span class="pl-k">.</span>builder(context)
+    .name(context<span class="pl-k">.</span>getPackageName() <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>.orma.db<span class="pl-pds">"</span></span>) <span class="pl-c">// optional</span>
+    .migrationEngine(<span class="pl-k">new</span> <span class="pl-smi">SchemaDiffMigration</span>(context, <span class="pl-smi">BuildConfig</span><span class="pl-c1"><span class="pl-k">.</span>DEBUG</span>)) <span class="pl-c">// optional</span>
+    .typeAdapters(<span class="pl-smi">TypeAdapterRegistry</span><span class="pl-k">.</span>defaultTypeAdapters()) <span class="pl-c">// optional</span>
+    .writeAheadLogging(<span class="pl-c1">true</span>) <span class="pl-c">// optional</span>
+    .trace(<span class="pl-smi">BuildConfig</span><span class="pl-c1"><span class="pl-k">.</span>DEBUG</span>) <span class="pl-c">// optional</span>
+    .readOnMainThread(<span class="pl-smi">AccessThreadConstraint</span><span class="pl-c1"><span class="pl-k">.</span>WARNING</span>) <span class="pl-c">// optional</span>
+    .writeOnMainThread(<span class="pl-smi">AccessThreadConstraint</span><span class="pl-c1"><span class="pl-k">.</span>FATAL</span>) <span class="pl-c">// optional</span>
+    .build();</pre></div>
+
+<p>Then, you can create, read, update and delete models:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Todo</span> todo <span class="pl-k">=</span> <span class="pl-c1">...</span>;
+
+<span class="pl-c">// create</span>
+orma<span class="pl-k">.</span>insertIntoTodo(todo);
+
+<span class="pl-c">// prepared statements with transaction</span>
+orma<span class="pl-k">.</span>transactionSync( <span class="pl-k">-</span><span class="pl-k">&gt;</span> { <span class="pl-c">// or transactionAsync() to execute tasks in background</span>
+    <span class="pl-k">Inserter&lt;<span class="pl-smi">Todo</span>&gt;</span> inserter <span class="pl-k">=</span> orma<span class="pl-k">.</span>prepareInsertIntoTodo();
+    inserter<span class="pl-k">.</span>execute(todo);
+});
+
+<span class="pl-c">// read</span>
+orma<span class="pl-k">.</span>selectFromTodo()
+  .titleEq(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>) <span class="pl-c">// equivalent to `where("title = ?", "foo")`</span>
+  .observable() <span class="pl-c">// first-class RxJava interface</span>
+  .subscribe(<span class="pl-c1">...</span>);
+
+<span class="pl-c">// update</span>
+orma<span class="pl-k">.</span>updateTodo()
+  .titleEq(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>)
+  .content(<span class="pl-s"><span class="pl-pds">"</span>a new content<span class="pl-pds">"</span></span>)
+  .execute();
+
+<span class="pl-c">// delete</span>
+orma<span class="pl-k">.</span>deleteFromTodo()
+  .titleEq(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>)
+  .execute();</pre></div>
+
+<p>Note that <strong>Orma checks DB access on main thread</strong> in trace build by default.
+Use background threads explicitly or RxJava interfaces with <code>Schedulers.io()</code>.</p>
+
+<h1>
+<a id="models" class="anchor" href="#models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Models</h1>
+
+<h2>
+<a id="condition-query-helpers" class="anchor" href="#condition-query-helpers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Condition Query Helpers</h2>
+
+<p>Condition Query Helpers, e.g. <code>titleEq()</code> shown above, are methods
+to help make <code>WHERE</code> clauses, generated for columns with <code>indexed = true</code>.</p>
+
+<p>Here is a list of Condition Query Helpers that are generated for all the <code>indexed</code>` columns:</p>
+
+<ul>
+<li>
+<code>*Eq(value)</code> to make <code>WHERE * = ?</code>
+</li>
+<li>
+<code>*NotEq(values)</code> to make <code>WHERE * &lt;&gt; ?</code>
+</li>
+<li>
+<code>*In(values)</code> to make <code>WHERE * IN (?, ?, ?, ...)</code>
+</li>
+<li>
+<code>*In(values)</code> to make <code>WHERE * NOT IN (?, ?, ?, ...)</code>
+</li>
+</ul>
+
+<p>The following are generated for <code>@Nullable</code> columns.</p>
+
+<ul>
+<li>
+<code>*IsNull()</code> to make <code>WHERE * IS NULL</code>
+</li>
+<li>
+<code>*IsNotNull()</code> to make <code>WHERE * IS NOT NULL</code>
+</li>
+</ul>
+
+<p>The following are generated for numeric columns
+ (i.e. <code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, and their corresponding box types)</p>
+
+<ul>
+<li>
+<code>*Lt(value)</code> to make <code>WHERE * &lt; ?</code>
+</li>
+<li>
+<code>*Le(value)</code> to make <code>WHERE * &lt;= ?</code>
+</li>
+<li>
+<code>*Gt(value)</code> to make <code>WHERE * &gt; ?</code>
+</li>
+<li>
+<code>*Ge(value)</code> to make <code>WHERE * &gt;= ?</code>
+</li>
+</ul>
+
+<h2>
+<a id="accessors" class="anchor" href="#accessors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Accessors</h2>
+
+<p>You can define private columns with <code>@Getter</code> and <code>@Setter</code>, which tells <code>orma-processor</code> to use accessors.</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Table</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">KeyValuePair</span> {
+
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> kKey <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> kValue <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>value<span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">@Column</span>(kKey)
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> key;
+
+    <span class="pl-k">@Column</span>(kValue)
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> value;
+
+    <span class="pl-k">@Getter</span>(kKey)
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getKey</span>() {
+        <span class="pl-k">return</span> key;
+    }
+
+    <span class="pl-k">@Setter</span>(kKey)
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setKey</span>(<span class="pl-smi">String</span> <span class="pl-v">key</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>key <span class="pl-k">=</span> key;
+    }
+
+    <span class="pl-k">@Getter</span>(kValue)
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getValue</span>() {
+        <span class="pl-k">return</span> value;
+    }
+
+    <span class="pl-k">@Setter</span>(kValue)
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setValue</span>(<span class="pl-smi">String</span> <span class="pl-v">value</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>value <span class="pl-k">=</span> value;
+    }
+}</pre></div>
+
+<h1>
+<a id="migration" class="anchor" href="#migration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Migration</h1>
+
+<p>Orma has pluggable migration mechanism via the <code>MigrationEngine</code> interface.</p>
+
+<p>The default migration engine is <code>SchemaDiffMigration</code>, which handles
+schema changes by making diff with old and new schemas.</p>
+
+<p>You can set a custom migration engine to OrmaDatabase builders:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">class</span> <span class="pl-en">CustomMigrationEngine</span> <span class="pl-k">implements</span> <span class="pl-e">MigrationEngine</span> { <span class="pl-c1">...</span> }
+
+<span class="pl-smi">OrmaDatabase</span> orma <span class="pl-k">=</span> <span class="pl-smi">OrmaDatabase</span><span class="pl-k">.</span>builder(context)
+  .migrationEngine(<span class="pl-k">new</span> <span class="pl-smi">CustomMigrationEngine</span>())
+  .build();</pre></div>
+
+<p>See <a href="migration/README.md">migration/README.md</a> for details.</p>
+
+<h1>
+<a id="type-adapters" class="anchor" href="#type-adapters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Type Adapters</h1>
+
+<p>Type adapters, which serializes and deserializes custom classes, are supported.</p>
+
+<p>If you use type adapters, you can add them to <code>OrmaDatabase</code>:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">class</span> <span class="pl-en">FooAdapter</span> <span class="pl-k">extends</span> <span class="pl-e">AbstractTypeAdapter&lt;<span class="pl-smi">Foo</span>&gt;</span> {
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">@NonNull</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">serialize</span>(<span class="pl-k">@NonNull</span> <span class="pl-smi">Foo</span> <span class="pl-v">source</span>) {
+        <span class="pl-k">return</span> <span class="pl-c1">...</span> serialize <span class="pl-c1">...</span>;
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">@NonNull</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Foo</span> <span class="pl-en">deserialize</span>(<span class="pl-k">@NonNull</span> <span class="pl-smi">String</span> <span class="pl-v">serialized</span>) {
+        <span class="pl-k">return</span> <span class="pl-c1">...</span> deserialize <span class="pl-c1">...</span>;
+    }
+}
+
+<span class="pl-smi">OrmaDatabase</span> orma <span class="pl-k">=</span> <span class="pl-smi">OrmaDatabase</span><span class="pl-k">.</span>builder(context)
+    .addTypeAdapters(<span class="pl-k">new</span> <span class="pl-smi">FooAdapter</span>())
+    .build();</pre></div>
+
+<h2>
+<a id="built-in-type-adapters" class="anchor" href="#built-in-type-adapters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Built-In Type Adapters</h2>
+
+<p>There are a few built-in type adapter provided by default:</p>
+
+<ul>
+<li>
+<code>StringListAdapter</code> for <code>List&lt;String&gt;</code>
+</li>
+<li>
+<code>StringSetAdapter</code> for <code>Set&lt;String&gt;</code>
+</li>
+<li>
+<code>DateAdapter</code> for <code>Date</code>
+</li>
+<li>
+<code>UriAdapter</code> for <code>Uri</code>
+</li>
+</ul>
+
+<h1>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h1>
+
+<p>There is an example app to demonstrate what Orma is.</p>
+
+<p>It is also including a simple benchmark with Realm and hand-written SQLiteDatabase
+operations.</p>
+
+<p>See <a href="example/">example/</a> for details.</p>
+
+<h1>
+<a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support</h1>
+
+<ul>
+<li>Use <a href="https://github.com/gfx/Android-Orma/issues">GitHub issues</a> for the issue tracker</li>
+<li>Feel free to ask for questions to the author <a href="https://twitter.com/__gfx__">@__gfx__</a>
+</li>
+</ul>
+
+<h1>
+<a id="licenses-in-runtime-dependencies" class="anchor" href="#licenses-in-runtime-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Licenses in Runtime Dependencies</h1>
+
+<ul>
+<li>
+<a href="https://github.com/ReactiveX/RxJava">https://github.com/ReactiveX/RxJava</a> - Apache Software License 2.0</li>
+<li>
+<a href="https://github.com/JSQLParser/JSqlParser">https://github.com/JSQLParser/JSqlParser</a> - LGPL v2.1 and Apache Software License 2.0 (dual licenses)</li>
+</ul>
+
+<h1>
+<a id="release-engineering" class="anchor" href="#release-engineering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release Engineering</h1>
+
+<div class="highlight highlight-source-shell"><pre>./gradlew bumpMajor <span class="pl-c"># or bumpMinor / bumpPatch</span>
+make publish <span class="pl-c"># does release engineering</span></pre></div>
+
+<h1>
+<a id="see-also" class="anchor" href="#see-also" aria-hidden="true"><span class="octicon octicon-link"></span></a>See Also</h1>
+
+<ul>
+<li><a href="http://sqlite.org/">SQLite</a></li>
+<li><a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html">SQLiteDatabase</a></li>
+<li><a href="http://stackoverflow.com/questions/2421189/version-of-sqlite-used-in-android">Version of SQLite used in Android? - Stack Overflow</a></li>
+</ul>
+
+<h1>
+<a id="author" class="anchor" href="#author" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author</h1>
+
+<p>FUJI Goro (gfx).</p>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>The MIT License.</p>
+
+<p>Copyright (c) 2015 FUJI Goro (gfx) <a href="mailto:gfuji@cpan.org">gfuji@cpan.org</a>.</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
+        </section>
+
+        <footer>
+          Orma is maintained by <a href="https://github.com/gfx">gfx</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-71102420-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
