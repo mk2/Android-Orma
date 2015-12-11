@@ -1,46 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta charset="UTF-8">
     <title>Orma by gfx</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
-    <div id="container">
-      <div class="inner">
+    <section class="page-header">
+      <h1 class="project-name">Orma</h1>
+      <h2 class="project-tagline">An ORM for Android as a wrapper of SQLiteDatabase</h2>
+      <a href="https://github.com/gfx/Android-Orma" class="btn">View on GitHub</a>
+      <a href="https://github.com/gfx/Android-Orma/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/gfx/Android-Orma/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <header>
-          <h1>Orma</h1>
-          <h2>An ORM for Android as a wrapper of SQLiteDatabase</h2>
-        </header>
-
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/gfx/Android-Orma/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/gfx/Android-Orma/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/gfx/Android-Orma" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
-
-        <hr>
-
-        <section id="main_content">
-          <h1>
-<a id="orma-for-android----" class="anchor" href="#orma-for-android----" aria-hidden="true"><span class="octicon octicon-link"></span></a>Orma for Android <a href="https://circleci.com/gh/gfx/Android-Orma/tree/master"><img src="https://circleci.com/gh/gfx/Android-Orma/tree/master.svg?style=svg" alt="Circle CI"></a> <a href="https://bintray.com/gfx/maven/orma/_latestVersion"> <img src="https://api.bintray.com/packages/gfx/maven/orma/images/download.svg" alt="Download"> </a>
+    <section class="main-content">
+      <h1>
+<a id="orma-for-android----" class="anchor" href="#orma-for-android----" aria-hidden="true"><span class="octicon octicon-link"></span></a>Orma for Android <a href="https://circleci.com/gh/gfx/Android-Orma/tree/master"><img src="https://circleci.com/gh/gfx/Android-Orma/tree/master.svg?style=svg" alt="Circle CI"></a> <a href="https://bintray.com/gfx/maven/orma/"> <img src="https://api.bintray.com/packages/gfx/maven/orma/images/download.svg" alt="Download"> </a>
 </h1>
 
-<ul>
-<li>Note that this is an <strong>alpha</strong> software and the interface will change until v1.0.0.</li>
-</ul>
+<p>This is an <strong>alpha</strong> software and the interface will change until v1.0.0.</p>
 
 <p>Orma is a lightning-fast ORM (Object-Relation Mapper) for <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html">Android SQLiteDatabase</a>,
-generating helper classes at compile time with annotation processing.</p>
+generating helper classes at compile time with <strong>annotation processing</strong>.</p>
 
 <p>There are already <a href="https://android-arsenal.com/tag/69">a lot of ORMs</a>. Why I have to add another?</p>
 
@@ -101,8 +87,8 @@ apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds"
 <div class="highlight highlight-source-groovy"><pre><span class="pl-c">// To use orma in your Android applications or libraries</span>
 
 dependencies {
-    apt <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma-processor:0.9.0<span class="pl-pds">'</span></span>
-    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma:0.9.0<span class="pl-pds">'</span></span>
+    apt <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma-processor:0.10.0<span class="pl-pds">'</span></span>
+    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma:0.10.0<span class="pl-pds">'</span></span>
 }</pre></div>
 
 <h1>
@@ -352,6 +338,19 @@ operations.</p>
 <p>See <a href="example/">example/</a> for details.</p>
 
 <h1>
+<a id="benchmark" class="anchor" href="#benchmark" aria-hidden="true"><span class="octicon octicon-link"></span></a>Benchmark</h1>
+
+<p>There is a simple benchmark with <a href="https://github.com/realm/realm-java">Realm</a> and hand-written code:</p>
+
+<p><a href="example/src/main/java/com/github/gfx/android/orma/example/activity/BenchmarkActivity.java">example/BenchmarkActivity</a></p>
+
+<p>Here is a result performed on Android 5.0.2 / Xperia Z4 as of Orma v0.10.0:</p>
+
+<p><img src="benchmark_v0.10.0_2015-12-10.png" alt="" width="443"></p>
+
+<p>It shows that Orma is a little faster than Realm (v0.86.0) and as fast as hand-written code.</p>
+
+<h1>
 <a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support</h1>
 
 <ul>
@@ -393,35 +392,29 @@ make publish <span class="pl-c"># does release engineering</span></pre></div>
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
 
-<p>The MIT License.</p>
+<p>Copyright (c) 2015 FUJI Goro (gfx).</p>
 
-<p>Copyright (c) 2015 FUJI Goro (gfx) <a href="mailto:gfuji@cpan.org">gfuji@cpan.org</a>.</p>
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
 
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
 
-<p>The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.</p>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
 
-<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</p>
-        </section>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/gfx/Android-Orma">Orma</a> is maintained by <a href="https://github.com/gfx">gfx</a>.</span>
 
-        <footer>
-          Orma is maintained by <a href="https://github.com/gfx">gfx</a><br>
-          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
 
-                  <script type="text/javascript">
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -432,7 +425,5 @@ THE SOFTWARE.</p>
             } catch(err) {}
           </script>
 
-      </div>
-    </div>
   </body>
 </html>
