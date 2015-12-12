@@ -23,7 +23,7 @@
 <a id="orma-for-android----" class="anchor" href="#orma-for-android----" aria-hidden="true"><span class="octicon octicon-link"></span></a>Orma for Android <a href="https://circleci.com/gh/gfx/Android-Orma/tree/master"><img src="https://circleci.com/gh/gfx/Android-Orma/tree/master.svg?style=svg" alt="Circle CI"></a> <a href="https://bintray.com/gfx/maven/orma/"> <img src="https://api.bintray.com/packages/gfx/maven/orma/images/download.svg" alt="Download"> </a>
 </h1>
 
-<p>This is an <strong>alpha</strong> software and the interface will change until v1.0.0.</p>
+<p>This is an <strong>alpha</strong> software and the interface will change until v1.0.0, which will be released Jan 2016.</p>
 
 <p>Orma is a lightning-fast ORM (Object-Relation Mapper) for <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html">Android SQLiteDatabase</a>,
 generating helper classes at compile time with <strong>annotation processing</strong>.</p>
@@ -33,11 +33,12 @@ generating helper classes at compile time with <strong>annotation processing</st
 <p>The answer is that I need ORM that have the following features:</p>
 
 <ul>
-<li>As fast as hand-written code is</li>
-<li>Model classes must have no restriction
+<li>As fast as hand-written code</li>
+<li>POJO models
 
 <ul>
-<li>They might be POJO, Parcelable and/or even models that are managed by another ORM</li>
+<li>That is, model classes must have no restriction</li>
+<li>Might implement <code>Parcelable</code> and/or extend any classes</li>
 <li>They should be passed to another thread</li>
 </ul>
 </li>
@@ -63,9 +64,11 @@ generating helper classes at compile time with <strong>annotation processing</st
 </li>
 </ul>
 </li>
+<li>Custom queries like <code>GROUP BY ... HAVING</code>
+</li>
 </ul>
 
-<p>They are just what Orma has. This is as fast as Realm, its models have no restriction, database handle is
+<p>They are just what Orma has. This is as fast as hand-written code, its models have no restriction, database handle is
 not a singleton, and has <code>SchemaDiffMigration</code> for automatic migration.</p>
 
 <h1>
@@ -126,7 +129,7 @@ dependencies {
 <p>To make it:</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-c">// see OrmaConfiguration for options</span>
-<span class="pl-c">// each value is the default value.</span>
+<span class="pl-c">// each value is the default.</span>
 <span class="pl-smi">OrmaDatabase</span> orma <span class="pl-k">=</span> <span class="pl-smi">OrmaDatabase</span><span class="pl-k">.</span>builder(context)
     .name(context<span class="pl-k">.</span>getPackageName() <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">"</span>.orma.db<span class="pl-pds">"</span></span>) <span class="pl-c">// optional</span>
     .migrationEngine(<span class="pl-k">new</span> <span class="pl-smi">SchemaDiffMigration</span>(context, <span class="pl-smi">BuildConfig</span><span class="pl-c1"><span class="pl-k">.</span>DEBUG</span>)) <span class="pl-c">// optional</span>
@@ -179,11 +182,11 @@ Use background threads explicitly or RxJava interfaces with <code>Schedulers.io(
 <p>Condition Query Helpers, e.g. <code>titleEq()</code> shown above, are methods
 to help make <code>WHERE</code> clauses, generated for columns with <code>indexed = true</code>.</p>
 
-<p>Here is a list of Condition Query Helpers that are generated for all the <code>indexed</code>` columns:</p>
+<p>Here is a list of Condition Query Helpers that are generated for all the <code>indexed</code> columns:</p>
 
 <ul>
 <li>
-<code>*Eq(value)</code> to make <code>WHERE * = ?</code>
+<code>*Eq(value)</code> to make <code>WHERE * = ?</code>, which is also generated for <code>@PrimaryKey</code>
 </li>
 <li>
 <code>*NotEq(values)</code> to make <code>WHERE * &lt;&gt; ?</code>
@@ -222,6 +225,17 @@ to help make <code>WHERE</code> clauses, generated for columns with <code>indexe
 </li>
 <li>
 <code>*Ge(value)</code> to make <code>WHERE * &gt;= ?</code>
+</li>
+</ul>
+
+<p>And <code>ORDER BY</code> helpers:</p>
+
+<ul>
+<li>
+<code>orderBy*Asc()</code> to make <code>ORDER BY * ASC</code>
+</li>
+<li>
+<code>orderBy*Desc()</code> to make <code>ORDER BY * DESC</code>
 </li>
 </ul>
 
@@ -270,9 +284,9 @@ to help make <code>WHERE</code> clauses, generated for columns with <code>indexe
 <p>Orma has pluggable migration mechanism via the <code>MigrationEngine</code> interface.</p>
 
 <p>The default migration engine is <code>SchemaDiffMigration</code>, which handles
-schema changes by making diff with old and new schemas.</p>
+schema changes by making diff with old and new table definitions.</p>
 
-<p>You can set a custom migration engine to OrmaDatabase builders:</p>
+<p>You can set a custom migration engine to <code>OrmaDatabase</code> builders:</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-k">class</span> <span class="pl-en">CustomMigrationEngine</span> <span class="pl-k">implements</span> <span class="pl-e">MigrationEngine</span> { <span class="pl-c1">...</span> }
 
@@ -344,11 +358,10 @@ operations.</p>
 
 <p><a href="example/src/main/java/com/github/gfx/android/orma/example/activity/BenchmarkActivity.java">example/BenchmarkActivity</a></p>
 
-<p>Here is a result performed on Android 5.0.2 / Xperia Z4 as of Orma v0.10.0:</p>
+<p>Here is a result performed on Android 5.0.2 / Xperia Z4
+as of Orma v0.10.0 and Realm 0.86.0:</p>
 
-<p><img src="benchmark_v0.10.0_2015-12-10.png" alt="" width="443"></p>
-
-<p>It shows that Orma is a little faster than Realm (v0.86.0) and as fast as hand-written code.</p>
+<p><img src="benchmark_v0.9.0_2015-12-10.png" alt="" width="443"></p>
 
 <h1>
 <a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support</h1>
@@ -387,7 +400,7 @@ make publish <span class="pl-c"># does release engineering</span></pre></div>
 <h1>
 <a id="author" class="anchor" href="#author" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author</h1>
 
-<p>FUJI Goro (gfx).</p>
+<p>FUJI Goro (<a href="https://github.com/gfx">gfx</a>).</p>
 
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
