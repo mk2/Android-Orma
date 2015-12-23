@@ -25,11 +25,20 @@
 
 <p>This is an <strong>alpha</strong> software and the interface will change until v1.0.0, which will be released Jan 2016.</p>
 
-<p>Orma is a lightning-fast ORM (Object-Relation Mapper) for <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html">Android SQLiteDatabase</a>,
+<p>Orma is an ORM (Object-Relation Mapper) for <a href="http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html">Android SQLiteDatabase</a>,
 generating helper classes at compile time with <strong>annotation processing</strong>.</p>
+
+<ul>
+<li>As fast as hand-written code with <code>SQLiteOpenHelper</code>
+</li>
+<li>Annotation-based schema definitions</li>
+<li>Semi-automatic migration</li>
+</ul>
 
 <h1>
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h1>
+
+<p>Orma requires <strong>JDK 8</strong> and <strong>Android API level 15</strong>.</p>
 
 <div class="highlight highlight-source-groovy"><pre><span class="pl-c">// To use "apt" in dependencies</span>
 
@@ -47,8 +56,8 @@ apply <span class="pl-c1">plugin</span>: <span class="pl-s"><span class="pl-pds"
 <div class="highlight highlight-source-groovy"><pre><span class="pl-c">// To use orma in your Android applications or libraries</span>
 
 dependencies {
-    apt <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma-processor:0.12.0<span class="pl-pds">'</span></span>
-    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma:0.12.0<span class="pl-pds">'</span></span>
+    apt <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma-processor:0.16.0<span class="pl-pds">'</span></span>
+    compile <span class="pl-s"><span class="pl-pds">'</span>com.github.gfx.android.orma:orma:0.16.0<span class="pl-pds">'</span></span>
 }</pre></div>
 
 <h1>
@@ -119,7 +128,7 @@ orma<span class="pl-k">.</span>selectFromTodo()
 <span class="pl-c">// update</span>
 orma<span class="pl-k">.</span>updateTodo()
   .titleEq(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>)
-  .content(<span class="pl-s"><span class="pl-pds">"</span>a new content<span class="pl-pds">"</span></span>)
+  .content(<span class="pl-s"><span class="pl-pds">"</span>a new content<span class="pl-pds">"</span></span>) <span class="pl-c">// to setup what are updated</span>
   .execute();
 
 <span class="pl-c">// delete</span>
@@ -153,7 +162,7 @@ Use background threads explicitly or RxJava interfaces with <code>Schedulers.io(
 <li>Not a singleton nor static-method based class</li>
 </ul>
 </li>
-<li>Automatic migration
+<li>Semi-automatic migration
 
 <ul>
 <li>For what can be detected logically</li>
@@ -169,7 +178,12 @@ Use background threads explicitly or RxJava interfaces with <code>Schedulers.io(
 </li>
 </ul>
 </li>
-<li>Custom queries like <code>GROUP BY ... HAVING</code>
+<li>Custom queries
+
+<ul>
+<li><code>GROUP BY ... HAVING ...</code></li>
+<li><code>SELECT max(value), min(value), avg(value) FROM ...</code></li>
+</ul>
 </li>
 </ul>
 
@@ -192,10 +206,10 @@ which is an entry point of all the high-level database operations.</p>
 has at least one field annotated with <code>@Column</code> or <code>@PrimaryKey</code>.</p>
 
 <p><code>orma-processor</code> generates a <code>OrmaDatabase</code> class and helper classes for
- each model: <code>Schema</code>, <code>Relation</code>, <code>Inserter</code>, <code>Updater</code>, and <code>Deleter</code>.</p>
+ each model: <code>Schema</code>, <code>Relation</code>, <code>Updater</code>, and <code>Deleter</code>.</p>
 
 <p>Because these helper classes are generated at the compile time, you
- can use Orma as a type-safe ORM.</p>
+can use Orma as a type-safe ORM.</p>
 
 <h2>
 <a id="schema-helper" class="anchor" href="#schema-helper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Schema Helper</h2>
@@ -211,20 +225,7 @@ has at least one field annotated with <code>@Column</code> or <code>@PrimaryKey<
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">Todo_Relation</span> relation <span class="pl-k">=</span> orma<span class="pl-k">.</span>selectFromTodo();</pre></div>
 
-<p>This is a query builder for <code>SELECT</code> statements.</p>
-
-<h2>
-<a id="inserter-helper" class="anchor" href="#inserter-helper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Inserter Helper</h2>
-
-<p>Inserter Helper, e.g. <code>Todo_Inserter</code>, is created by the database handle:</p>
-
-<div class="highlight highlight-source-java"><pre># <span class="pl-k">for</span> a normal <span class="pl-c1">INSERT</span> statement
-<span class="pl-smi">Todo_Inserter</span> inserter <span class="pl-k">=</span> orma<span class="pl-k">.</span>prepateInsertIntoTodo();
-
-# <span class="pl-k">for</span> an <span class="pl-c1">INSERT</span> <span class="pl-c1">OR</span> <span class="pl-c1">REPLACE</span> statement (a<span class="pl-k">.</span>k<span class="pl-k">.</span>a. <span class="pl-s"><span class="pl-pds">"</span>upsert<span class="pl-pds">"</span></span>)
-<span class="pl-smi">Todo_Inserter</span> upserter <span class="pl-k">=</span> orma<span class="pl-k">.</span>prepateInsertOrReplaceIntoTodo();</pre></div>
-
-<p>This is a prepared statement for <code>INSERT</code> statements.</p>
+<p>This is a query builder for <code>SELECT ... FROM *</code> statements.</p>
 
 <h2>
 <a id="updater-helper" class="anchor" href="#updater-helper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updater Helper</h2>
@@ -233,7 +234,7 @@ has at least one field annotated with <code>@Column</code> or <code>@PrimaryKey<
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">Todo_Updater</span> updater <span class="pl-k">=</span> orma<span class="pl-k">.</span>updateTodo();</pre></div>
 
-<p>This is a query builder for <code>UPDATE</code> statements.</p>
+<p>This is a query builder for <code>UPDATE *</code> statements.</p>
 
 <h2>
 <a id="deleter-helper" class="anchor" href="#deleter-helper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deleter Helper</h2>
@@ -242,13 +243,13 @@ has at least one field annotated with <code>@Column</code> or <code>@PrimaryKey<
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">Todo_Deleter</span> deleter <span class="pl-k">=</span> orma<span class="pl-k">.</span>deleteFromTodo();</pre></div>
 
-<p>This is a query builder for <code>DELETE FROM</code> statements.</p>
+<p>This is a query builder for <code>DELETE FROM *</code> statements.</p>
 
 <h2>
 <a id="condition-query-helpers" class="anchor" href="#condition-query-helpers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Condition Query Helpers</h2>
 
 <p>There are Condition Query Helpers, e.g. <code>titleEq()</code> shown in the synopsis
-section, which ar methods to help make <code>WHERE</code> and <code>ORDER BY</code> clauses,
+section, which are methods to help make <code>WHERE</code> and <code>ORDER BY</code> clauses,
 generated for columns with <code>indexed = true</code> or the <code>@PrimaryKey</code> column.</p>
 
 <p>Here is a list of Condition Query Helpers that are generated for all the <code>indexed</code> columns:</p>
@@ -309,22 +310,23 @@ generated for columns with <code>indexed = true</code> or the <code>@PrimaryKey<
 </ul>
 
 <h2>
-<a id="accessors" class="anchor" href="#accessors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Accessors</h2>
+<a id="setters-and-getters" class="anchor" href="#setters-and-getters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setters and Getters</h2>
 
 <p>You can define private columns with <code>@Getter</code> and <code>@Setter</code>,
- which tells <code>orma-processor</code> to use accessors.</p>
+which tells <code>orma-processor</code> to use accessors.</p>
+
+<p>Each accessor name can specify a column name in SQLite database,
+which is inferred from its method name if omitted.</p>
 
 <div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Table</span>
 <span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">KeyValuePair</span> {
 
     <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> kKey <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>;
 
-    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> kValue <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>value<span class="pl-pds">"</span></span>;
-
-    <span class="pl-k">@Column</span>(kKey)
+    <span class="pl-k">@Column</span>(kKey) <span class="pl-c">// specifies the name</span>
     <span class="pl-k">private</span> <span class="pl-smi">String</span> key;
 
-    <span class="pl-k">@Column</span>(kValue)
+    <span class="pl-k">@Column</span> <span class="pl-c">// omits the name</span>
     <span class="pl-k">private</span> <span class="pl-smi">String</span> value;
 
     <span class="pl-k">@Getter</span>(kKey)
@@ -337,13 +339,35 @@ generated for columns with <code>indexed = true</code> or the <code>@PrimaryKey<
         <span class="pl-v">this</span><span class="pl-k">.</span>key <span class="pl-k">=</span> key;
     }
 
-    <span class="pl-k">@Getter</span>(kValue)
+    <span class="pl-k">@Getter</span> <span class="pl-c">// getter for the "value" column</span>
     <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getValue</span>() {
         <span class="pl-k">return</span> value;
     }
 
-    <span class="pl-k">@Setter</span>(kValue)
+    <span class="pl-k">@Setter</span> <span class="pl-c">// setter for the "value" column</span>
     <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">setValue</span>(<span class="pl-smi">String</span> <span class="pl-v">value</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>value <span class="pl-k">=</span> value;
+    }
+}</pre></div>
+
+<h2>
+<a id="immutable-models" class="anchor" href="#immutable-models" aria-hidden="true"><span class="octicon octicon-link"></span></a>Immutable Models</h2>
+
+<p>Immutable models, where all the fields are declared with <code>final</code>, are supported
+by annotating a constructor with <code>@Setter</code>.</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Table</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">KeyValuePair</span> {
+
+    <span class="pl-k">@Column</span>
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> key;
+
+    <span class="pl-k">@Column</span>
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> value;
+
+    <span class="pl-k">@Setter</span>
+    <span class="pl-en">KeyVakuePair</span>(<span class="pl-smi">String</span> <span class="pl-v">key</span>, <span class="pl-smi">String</span> <span class="pl-v">value</span>) {
+        <span class="pl-v">this</span><span class="pl-k">.</span>key <span class="pl-k">=</span> key;
         <span class="pl-v">this</span><span class="pl-k">.</span>value <span class="pl-k">=</span> value;
     }
 }</pre></div>
@@ -391,10 +415,12 @@ schema changes by making diff with old and new table definitions.</p>
     .addTypeAdapters(<span class="pl-k">new</span> <span class="pl-smi">FooAdapter</span>())
     .build();</pre></div>
 
+<p><strong>The interface is alpha quality and are likely to change.</strong></p>
+
 <h2>
 <a id="built-in-type-adapters" class="anchor" href="#built-in-type-adapters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Built-In Type Adapters</h2>
 
-<p>There are a few built-in type adapter provided by default:</p>
+<p>There are a lot of built-in type adapter provided by default, which include:</p>
 
 <ul>
 <li>
@@ -411,27 +437,18 @@ schema changes by making diff with old and new table definitions.</p>
 </li>
 </ul>
 
+<p>See <a href="library/src/main/java/com/github/gfx/android/orma/adapter">adapter/</a>
+for all the adapters.</p>
+
 <h1>
 <a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h1>
 
-<p>There is an example app to demonstrate what Orma is.</p>
+<p>There is an example app to demonstrate what Orma does.</p>
 
-<p>It is also including a simple benchmark with Realm and hand-written SQLiteDatabase
+<p>It also includesa simple benchmark with Realm and hand-written SQLiteDatabase
 operations.</p>
 
 <p>See <a href="example/">example/</a> for details.</p>
-
-<h1>
-<a id="benchmark" class="anchor" href="#benchmark" aria-hidden="true"><span class="octicon octicon-link"></span></a>Benchmark</h1>
-
-<p>There is a simple benchmark with <a href="https://github.com/realm/realm-java">Realm</a> and hand-written code:</p>
-
-<p><a href="example/src/main/java/com/github/gfx/android/orma/example/activity/BenchmarkActivity.java">example/BenchmarkActivity</a></p>
-
-<p>Here is a result performed on Android 5.0.2 / Xperia Z4
-as of Orma v0.9.0 and Realm 0.86.0:</p>
-
-<p><img src="benchmark_v0.9.0_2015-12-10.png" alt="" width="443"></p>
 
 <h1>
 <a id="support" class="anchor" href="#support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support</h1>
