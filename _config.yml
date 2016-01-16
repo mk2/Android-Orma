@@ -1,0 +1,3 @@
+exclude: ['vendor', 'Gemfile', 'Gemfile.lock', 'README.md', 'node_modules']
+
+timezone: Asia/Tokyo
